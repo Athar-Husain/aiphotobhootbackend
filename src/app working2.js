@@ -7,25 +7,19 @@ import fs from "fs";
 
 const app = express();
 
-// ----------------------------
-// Allowed frontend origins
-// ----------------------------
+// Collect allowed origins from environment variables
 const FRONTEND_URLS = [
   process.env.FRONTEND_URL,
   process.env.FRONTEND_URL2,
   process.env.BASE_URL,
-].filter(Boolean); // remove undefined or empty
+].filter(Boolean); // removes undefined or empty values
 
-// ----------------------------
 // Create upload folders if missing
-// ----------------------------
 ["src/public/uploads", "src/public/generated"].forEach((dir) => {
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 });
 
-// ----------------------------
-// Global CORS for API routes
-// ----------------------------
+// ✅ CORS setup for API routes
 app.use(
   cors({
     origin: (origin, callback) => {
@@ -44,54 +38,30 @@ app.use(
 app.use(helmet());
 app.use(express.json());
 
-// ----------------------------
-// Serve uploads with CORS for frontend URLs only
-// ----------------------------
-app.use(
-  "/uploads",
-  (req, res, next) => {
-    const origin = req.headers.origin;
-    if (FRONTEND_URLS.includes(origin)) {
-      res.setHeader("Access-Control-Allow-Origin", origin);
-      res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
-      res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-    }
+// Static folders
 
-    if (req.method === "OPTIONS") return res.sendStatus(204);
+// Serve uploads normally
+app.use("/uploads", express.static("src/public/uploads"));
 
-    next();
-  },
-  express.static("src/public/uploads"),
-);
-
-// ----------------------------
 // Serve generated images with CORS for frontend URLs only
-// ----------------------------
 app.use(
   "/generated",
   (req, res, next) => {
     const origin = req.headers.origin;
     if (FRONTEND_URLS.includes(origin)) {
       res.setHeader("Access-Control-Allow-Origin", origin);
-      res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
-      res.setHeader("Access-Control-Allow-Headers", "Content-Type");
     }
-
-    if (req.method === "OPTIONS") return res.sendStatus(204);
-
+    res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
     next();
   },
   express.static("src/public/generated"),
 );
 
-// ----------------------------
-// API routes
-// ----------------------------
+// Routes
 app.use("/api/avatar", avatarRoutes);
 
-// ----------------------------
 // Health check
-// ----------------------------
 app.get("/", (req, res) => res.send("AI Photobooth Running 🚀"));
 
 export default app;
