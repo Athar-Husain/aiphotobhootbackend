@@ -13,6 +13,10 @@ app.use(
     credentials: true,
   }),
 );
+
+
+app.options("*", cors());
+
 app.use(helmet());
 app.use(express.json());
 
