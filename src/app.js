@@ -7,23 +7,24 @@ import fs from "fs";
 
 const app = express();
 
-// Allow multiple frontend URLs
+// Collect allowed origins from environment variables
 const FRONTEND_URLS = [
-  process.env.FRONTEND_URL1,
+  process.env.FRONTEND_URL,
   process.env.FRONTEND_URL2,
-].filter(Boolean); // remove undefined/null values
+  process.env.BASE_URL,
+].filter(Boolean); // removes undefined or empty values
 
-// create upload folders if missing
+// Create upload folders if missing
 ["src/public/uploads", "src/public/generated"].forEach((dir) => {
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 });
 
-// ✅ CORS
+// ✅ CORS setup
 app.use(
   cors({
     origin: (origin, callback) => {
+      // allow requests with no origin (e.g., Postman) or from allowed URLs
       if (!origin || FRONTEND_URLS.includes(origin)) {
-        // allow requests with no origin (like Postman) or from allowed URLs
         callback(null, true);
       } else {
         callback(new Error("Not allowed by CORS"));
@@ -37,14 +38,14 @@ app.use(
 app.use(helmet());
 app.use(express.json());
 
-// static folders
+// Static folders
 app.use("/uploads", express.static("src/public/uploads"));
 app.use("/generated", express.static("src/public/generated"));
 
-// routes
+// Routes
 app.use("/api/avatar", avatarRoutes);
 
-// health check
+// Health check
 app.get("/", (req, res) => res.send("AI Photobooth Running 🚀"));
 
 export default app;
