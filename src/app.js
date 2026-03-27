@@ -5,6 +5,8 @@ import helmet from "helmet";
 import avatarRoutes from "./routes/avatar.routes.js";
 
 const app = express();
+const FRONTEND_URL = process.env.FRONTEND_URL;
+
 app.use(
   cors({
     origin: FRONTEND_URL,
