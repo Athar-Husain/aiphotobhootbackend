@@ -6,16 +6,7 @@ import avatarRoutes from "./routes/avatar.routes.js";
 
 const app = express();
 
-const FRONTEND_URL = process.env.FRONTEND_URL;
-
-app.use(
-  cors({
-    origin: FRONTEND_URL,
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true,
-  }),
-);
-
+app.use(cors());
 app.use(helmet());
 app.use(express.json());
 
