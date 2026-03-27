@@ -6,12 +6,13 @@ import avatarRoutes from "./routes/avatar.routes.js";
 import fs from "fs";
 
 const app = express();
+// const FRONTEND_URL = process.env.FRONTEND_URL;
 
-// Allow multiple frontend URLs
+
 const FRONTEND_URLS = [
   process.env.FRONTEND_URL1,
   process.env.FRONTEND_URL2,
-].filter(Boolean); // remove undefined/null values
+];
 
 // create upload folders if missing
 ["src/public/uploads", "src/public/generated"].forEach((dir) => {
@@ -21,14 +22,7 @@ const FRONTEND_URLS = [
 // ✅ CORS
 app.use(
   cors({
-    origin: (origin, callback) => {
-      if (!origin || FRONTEND_URLS.includes(origin)) {
-        // allow requests with no origin (like Postman) or from allowed URLs
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
+    origin: FRONTEND_URL || "*",
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   }),

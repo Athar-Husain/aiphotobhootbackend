@@ -23,7 +23,6 @@ export const generateAvatarAI = async (imageBuffer, promptText) => {
 
   // Call the Gemini API
   const response = await ai.models.generateContent({
-    // model: "gemini-2.5-flash-image", // updated model from docs
     model: "gemini-3.1-flash-image-preview", // updated model from docs
     contents: prompt,
   });
